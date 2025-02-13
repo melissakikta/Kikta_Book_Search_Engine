@@ -3,9 +3,9 @@ This app converts a fully functioning Google Books API search engine built with 
 
 
 ## 📚 Description
-In this application, Express.js, a MongoDB database, and Mongoose ODM are used to navigates the data created and stored in a social network. 
+In this application,a user can create a login and search through Google's Books API. A user can save books to their profile if they are logged in. If a user does not want a book to be in their saved library, they can delete the book. 
 
-A video tutorial can be found [here](https://drive.google.com/file/d/1A_XczHEQrfvne-R8MWqjfIUgIhK9obLz/view?usp=sharing) 
+[Deployed Site](link here) 
 
 ## 🚀 Table of Contents
   * [Usage](#📝-Usage)
@@ -19,49 +19,30 @@ A video tutorial can be found [here](https://drive.google.com/file/d/1A_XczHEQrf
 
 Here are screenshots of the code tested in Insomnia 
 
-<u><strong>Users</strong></u>
+<u><strong>Login</strong></u>
 
-![Navigation](./assets/images/users.png)
-
-
-
-<u><strong>Thoughts</strong></u>
-
-![Portfolio](./assets/images/thoughts.png)
+![Navigation](./assets/images/login.png)
 
 
 
-<u><strong>Single User</strong></u>
+<u><strong>Search</strong></u>
 
-![Portfolio](./assets/images/single_user.png)
-
-
-
-<u><strong>Create User</strong></u>
-
-![Portfolio](./assets/images/create_user.png)
+![Portfolio](./assets/images/search.png)
 
 
 
-<u><strong>Update User</strong></u>
+<u><strong>Saved Books</strong></u>
 
-![Portfolio](./assets/images/update_user.png)
-
-
-
-<u><strong>Delete User</strong></u>
-
-![Portfolio](./assets/images/delete_user.png)
-
+![Portfolio](./assets/images/saved.png)
 
 
 Back to [Table-of-Contents](#🚀-table-of-contents)
 
 
 ## ⭐ Features
-  * Users share thoughts
-  * Users react to friends' thoughts
-  * Users create a friend list
+  * User Login
+  * Search Books
+  * Save Books
 
 
 Back to [Table-of-Contents](#🚀-table-of-contents)
