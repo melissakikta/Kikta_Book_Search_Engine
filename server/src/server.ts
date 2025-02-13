@@ -5,9 +5,11 @@ import path from 'node:path';
 
 import { typeDefs, resolvers } from './schemas/index.js';
 import db from './config/connection.js';
+import { authMiddleware } from './utils/auth.js';
 
 const PORT = process.env.PORT || 3001;
 const app = express();
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -19,7 +21,9 @@ const startApolloServer = async () => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
 
-  app.use('/graphql', expressMiddleware(server));
+  app.use('/graphql', expressMiddleware(server, {
+    context: authMiddleware //add the middleware to the context
+  }));
   
   // if we're in production, serve client/build as static assets
   if (process.env.NODE_ENV === 'production') {
@@ -30,11 +34,11 @@ const startApolloServer = async () => {
   });
   }
     
-  db.on('error', console.error.bind(console, "MongoDB connection error:"));
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`);
+  db.once('open', () => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`);
+    });
   });
 };
 
