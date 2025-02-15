@@ -40,7 +40,7 @@ export const authMiddleware = ({ req }: { req: any }): MyContext => {
 // Sign token function
 export const signToken = (user: IUserDocument): string => {
   const payload: JwtPayload = {
-    _id: user._id.toString(),
+    _id: (user._id as string).toString(),
     username: user.username,
     email: user.email
   };
