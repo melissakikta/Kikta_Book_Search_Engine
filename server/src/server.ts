@@ -5,7 +5,7 @@ import path from 'node:path';
 
 import { typeDefs, resolvers } from './schemas/index.js';
 import db from './config/connection.js';
-import { authMiddleware } from './utils/auth.js';
+import { authMiddleware } from './services/auth.js';
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -21,9 +21,14 @@ const startApolloServer = async () => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
 
-  app.use('/graphql', expressMiddleware(server, {
-    context: authMiddleware //add the middleware to the context
-  }));
+  app.use(
+    '/graphql', 
+    expressMiddleware(server, {
+      context: async ({ req}) => {
+        return authMiddleware({ req }); //add the middleware to the context
+      },
+    })
+);
   
   // if we're in production, serve client/build as static assets
   if (process.env.NODE_ENV === 'production') {
@@ -37,7 +42,7 @@ const startApolloServer = async () => {
   db.once('open', () => {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
-      console.log(`Use GraphQL at http://localhost:${PORT}${server.graphqlPath}`);
+      console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
     });
   });
 };

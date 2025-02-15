@@ -18,6 +18,10 @@
   },
   "dependencies": {
     "@apollo/client": "^3.13.1",
+    "@apollo/server": "^4.11.3",
+    "@graphql-tools/schema": "^10.0.18",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
     "graphql": "^16.10.0"
   }
 }

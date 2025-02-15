@@ -11,7 +11,7 @@ import {
 
 import Auth from '../utils/auth';
 import { searchGoogleBooks } from '../utils/API';
-import { getSavedBookIds } from '../utils/localStorage';
+import { getSavedBookIds, saveBookIds } from '../utils/localStorage';
 
 import type { Book } from '../models/Book';
 import type { GoogleAPIBook } from '../models/GoogleAPIBook';
@@ -36,7 +36,7 @@ const SearchBooks = () => {
   // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
   useEffect(() => {
     return () => savedBookIds(savedBookIds);
-  });
+  }, [savedBookIds]);
 
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
