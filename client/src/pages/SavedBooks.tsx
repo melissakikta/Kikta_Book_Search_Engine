@@ -14,7 +14,9 @@ const SavedBooks = () => {
 
   //set up mutation for removing a book
   const [removeBook] = useMutation(REMOVE_BOOK, {
-    update(cache: ApolloCache<any>, { data }:{ data: { removeBook:any } }) {
+    update(cache: ApolloCache<any>, { data }: { data?: { removeBook:any } }) {
+      if (!data) return;
+      
       try {
         cache.writeQuery({
           query: GET_ME,

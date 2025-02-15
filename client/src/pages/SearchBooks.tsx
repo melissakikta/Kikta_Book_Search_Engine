@@ -11,7 +11,7 @@ import {
 
 import Auth from '../utils/auth';
 import { searchGoogleBooks } from '../utils/API';
-import { getSavedBookIds, saveBookIds } from '../utils/localStorage';
+import { getSavedBookIds} from '../utils/localStorage';
 
 import type { Book } from '../models/Book';
 import type { GoogleAPIBook } from '../models/GoogleAPIBook';
