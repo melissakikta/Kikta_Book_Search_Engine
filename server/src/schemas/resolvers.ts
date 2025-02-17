@@ -5,7 +5,7 @@ import models from "../models/index.js";
 
 const { User } = models;
 
-const { GraphQLError } = require('graphql');
+import { GraphQLError } from 'graphql';
 
 interface BookInput {
   bookId: string;
@@ -16,8 +16,10 @@ interface BookInput {
   link?: string;
 }
 
+
 const resolvers = {
   Query: {
+    
     // Get the logged in user's data
     me: async (_: any, __: any, context: { user?: IUserDocument }) => {
       if (context.user) {
@@ -31,7 +33,7 @@ const resolvers = {
     // Add a new user
     addUser: async (_: any, { username, email, password }: { username: string; email: string; password: string }) => {
       const user = await User.create({ username, email, password });
-      const token = signToken(user);
+      const token = signToken(user.username, user.email, user._id);
       return { token, user };
     },
 
@@ -49,7 +51,7 @@ const resolvers = {
         throw new GraphQLError('Incorrect credentials', {extensions: {code: 'UNAUTHENTICATED'}});
       }
 
-      const token = signToken(user);
+      const token = signToken(user.username, user.email, user._id);
       return { token, user };
     },
 

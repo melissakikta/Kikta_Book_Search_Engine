@@ -1,51 +1,99 @@
+import type { Request, Response, NextFunction } from 'express';
+import { GraphQLError } from 'graphql';
 import jwt from 'jsonwebtoken';
-import type { IUserDocument } from '../models/User';
 
-//JWT payload
+
+import dotenv from 'dotenv';
+dotenv.config();
+
 interface JwtPayload {
   _id: unknown;
   username: string;
   email: string,
 }
 
-//Context for GraphQL
-interface MyContext {
+interface UserLike {
+  _id: unknown;
+  username: string;
+  email: string;
+}
+
+interface Context {
+  token?: string;
   user?: JwtPayload;
 }
 
-//auth middleware for GraphQL context
-export const authMiddleware = ({ req }: { req: any }): MyContext => {
-  // Get token from header
-  let token = req.headers.authorization || '';
+//Rest Middleware
+export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
 
-  // ["Bearer", "<tokenvalue>"]
-  if (token.startsWith('Bearer ')) {
-    token = token.slice(7);
+  if (authHeader) {
+    const token = authHeader.split(' ')[1];
+    const secretKey = process.env.JWT_SECRET_KEY || '';
+
+    jwt.verify(token, secretKey, (err, user) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+
+      req.user = user as JwtPayload;
+      return next();
+    });
+  } else {
+    res.sendStatus(401); //Unauthorized
   }
+};
 
-  if (!token) {
+//GraphQL context creator
+export const createContext = async ({ req }: { req: any }): Promise<Context> => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
     return {};
   }
+
+  const token = authHeader.split(' ')[1];
+  const secretKey = process.env.JWT_SECRET_KEY || '';
 
   try {
-    const secretKey = process.env.JWT_SECRET_KEY || 'mysecretsshhhhh';
-    const payload = jwt.verify(token, secretKey) as JwtPayload;
-    return { user: payload };
-  } catch (err) {
-    console.log('Invalid token');
-    return {};
+    const user = jwt.verify(token, secretKey) as JwtPayload;
+    return { token, user };
+  } catch (error) {
+    throw new GraphQLError('Invalid token');
   }
 };
 
-// Sign token function
-export const signToken = (user: IUserDocument): string => {
-  const payload: JwtPayload = {
-    _id: (user._id as string).toString(),
-    username: user.username,
-    email: user.email
-  };
-  
-  const secretKey = process.env.JWT_SECRET_KEY || 'mysecretsshhhhh';
-  
-  return jwt.sign(payload, secretKey, { expiresIn: '2h' });
-};
+//GraphQL middleware
+export const authenticateGraphQLToken = (next: any) => (root: any, args: any, context: Context, info: any) => {
+  if (!context.user) {
+    throw new GraphQLError('Not authenticated', {
+      extensions: {
+        code: 'UNAUTHENTICATED',
+        http: { status: 401 },
+      },
+    });
+  }
+
+  return next(root, args, context, info);
+}
+
+//Token signing with overloads to support both object and parameter approches
+export function signToken(user: UserLike): string;
+export function signToken(username: string, email: string, _id: unknown): string;
+export function signToken(userOrUsername: UserLike | string, email?: string, _id?: unknown): string {
+  const secretKey = process.env.JWT_SECRET_KEY || '';
+
+  if (typeof userOrUsername === 'string') {
+    if (!email || _id === undefined) {
+      throw new Error('Email and -id must be provided');
+     }
+      return jwt.sign({ username: userOrUsername, email, _id }, secretKey, { expiresIn: '1h' });
+    } else {
+      const { username, email, _id } = userOrUsername;
+      return jwt.sign({ username, email, _id }, secretKey, { expiresIn: '1h' });
+    }
+  }
+
+  export const createdProtectedResolver = (resolver: Function) => {
+    return authenticateGraphQLToken(resolver);
+  }
