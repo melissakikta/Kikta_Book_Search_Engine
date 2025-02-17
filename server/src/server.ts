@@ -13,11 +13,18 @@ const app = express();
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  introspection: process.env.NODE_ENV !== 'production',
 });
 
 const startApolloServer = async () => {
-  await server.start();
   
+  try {
+    await server.start();
+    console.log("Apollo Server Started Succesffuly!");
+  } catch (error) {
+    console.error('Error starting Apollo Server:', error);
+  }
+
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
 
@@ -26,7 +33,7 @@ const startApolloServer = async () => {
     expressMiddleware(server, {
       context: createContext
     })
-);
+  );
   
   // if we're in production, serve client/build as static assets
   if (process.env.NODE_ENV === 'production') {
@@ -34,15 +41,20 @@ const startApolloServer = async () => {
 
     app.get('*', (_, res) => {
       res.sendFile(path.join(__dirname, '../client/build/index.html'));
-  });
+    });
   }
-    
+  
+  db.on('error', (err) => {
+    console.error('MongoDB connection error:', err);
+  });
+  
   db.once('open', () => {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
     });
   });
+
 };
 
 startApolloServer();
