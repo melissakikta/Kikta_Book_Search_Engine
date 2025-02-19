@@ -13,48 +13,50 @@ const app = express();
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  introspection: process.env.NODE_ENV !== 'production',
+  // introspection: process.env.NODE_ENV !== 'production',
 });
 
 const startApolloServer = async () => {
   
   try {
     await server.start();
-    console.log("Apollo Server Started Succesffuly!");
-  } catch (error) {
-    console.error('Error starting Apollo Server:', error);
-  }
-
-  app.use(express.urlencoded({ extended: true }));
-  app.use(express.json());
-
-  app.use(
-    '/graphql', 
-    expressMiddleware(server, {
-      context: createContext
-    })
-  );
-  
-  // if we're in production, serve client/build as static assets
-  if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../client/build')));
-
-    app.get('*', (_, res) => {
-      res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    console.log("Apollo Server Started Successfully!");
+    
+    app.use(express.urlencoded({ extended: true }));
+    app.use(express.json());
+    
+    app.use(
+      '/graphql', 
+      expressMiddleware(server, {
+        context: createContext
+      })
+    );
+    
+    
+    db.on('error', (err) => {
+      console.error('MongoDB connection error:', err);
     });
-  }
-  
-  db.on('error', (err) => {
-    console.error('MongoDB connection error:', err);
-  });
-  
-  db.once('open', () => {
+    
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
     });
-  });
+    // db.once('open', () => {
+    // });
+    
+  } catch (error) {
+    console.error('Error starting Apollo Server:', error);
+  }
 
+  // if we're in production, serve client/dist as static assets
+  if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../client/dist')));
+
+    app.get('*', (_, res) => {
+      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+    });
+  }
+  
 };
 
 startApolloServer();
