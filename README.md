@@ -24,6 +24,10 @@ Here are screenshots of the code tested in Insomnia
 ![Navigation](./assets/images/login.png)
 
 
+<u><strong>Signup</strong></u>
+
+![Navigation](./assets/images/signup.png)
+
 
 <u><strong>Search</strong></u>
 
