@@ -37,12 +37,11 @@ const startApolloServer = async () => {
       console.error('MongoDB connection error:', err);
     });
     
-    app.listen(PORT, () => {
+    app.listen(PORT as number, '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);
-      console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
+      console.log(`Use GraphQL at http://0.0.0.0:${PORT}/graphql`);
     });
-    // db.once('open', () => {
-    // });
+
     
   } catch (error) {
     console.error('Error starting Apollo Server:', error);
