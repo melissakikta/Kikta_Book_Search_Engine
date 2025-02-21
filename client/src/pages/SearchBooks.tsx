@@ -11,7 +11,7 @@ import {
 
 import Auth from '../utils/auth';
 import { searchGoogleBooks } from '../utils/API';
-import { getSavedBookIds} from '../utils/localStorage';
+import { getSavedBookIds, saveBookIds} from '../utils/localStorage';
 
 import type { Book } from '../models/Book';
 import type { GoogleAPIBook } from '../models/GoogleAPIBook';
@@ -35,8 +35,8 @@ const SearchBooks = () => {
   // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
   // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
   useEffect(() => {
-    return () => setSavedBookIds(savedBookIds);
-  }, [savedBookIds]);
+    return () => saveBookIds(savedBookIds);
+  }, );
 
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -83,7 +83,7 @@ const SearchBooks = () => {
     }
 
     try {
-      const { data} = await saveBook({
+      await saveBook({
         variables: {
           bookData: {
             bookId: bookToSave.bookId,
@@ -95,10 +95,10 @@ const SearchBooks = () => {
           }
         });
 
-      if (data) { 
+      // if (data) { 
         // if book successfully saves to user's account, save book id to state
         setSavedBookIds([...savedBookIds, bookToSave.bookId]);
-      }
+      // }
     } catch (err) {
       console.error(err);
     }

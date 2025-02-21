@@ -5,7 +5,7 @@ import path from 'node:path';
 
 import { typeDefs, resolvers } from './schemas/index.js';
 import db from './config/connection.js';
-import { createContext } from './services/auth.js';
+import { authenticateToken } from './services/auth.js';
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -28,7 +28,7 @@ const startApolloServer = async () => {
     app.use(
       '/graphql', 
       expressMiddleware(server, {
-        context: createContext
+        context: authenticateToken as any
       })
     );
     
